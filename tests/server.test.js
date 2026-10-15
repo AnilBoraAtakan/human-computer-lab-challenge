@@ -179,3 +179,31 @@ test("cross-origin requests fail and credentials are absent from public status",
   const status = await (await originalFetch(base + "/api/status")).text();
   assert.ok(!status.includes("test-key-not-a-secret"));
 });
+
+test("scene goals cannot aim at remembered locations or store people as objects", async () => {
+  const { body: session } = await request("/api/session", {});
+  modelResult = {
+    ...plan,
+    objects: [
+      {
+        label: "Person",
+        description: "person near the center",
+        x: 0.2,
+        y: 0.5,
+        confidence: 0.99,
+      },
+    ],
+    evidence: "The pen was previously visible on the left.",
+  };
+  const result = await request("/api/turn", {
+    session_id: session.session_id,
+    text: "Check the pen",
+    frame: frame(),
+  });
+  assert.equal(result.status, 200);
+  assert.deepEqual(result.body.memory, []);
+  assert.deepEqual(result.body.objects, []);
+  assert.deepEqual(result.body.actions, []);
+  assert.match(result.body.reply, /can't locate/);
+  assert.equal(result.body.requires_verification, true);
+});

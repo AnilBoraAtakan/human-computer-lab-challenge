@@ -62,11 +62,45 @@ export const VerificationInput = z
   })
   .strict();
 
+export function sceneObjects(objects) {
+  // Backstop for common people labels; model output is not a trusted object inventory.
+  return objects.filter(
+    (o) =>
+      !/\b(person|people|human|man|woman|child|boy|girl|face|hand|hands)\b/i.test(
+        o.label,
+      ),
+  );
+}
+
+export function groundGoalActions(plan) {
+  if (plan.intent !== "goal") return plan;
+  const actions = plan.actions.filter(
+    (action) =>
+      action.type !== "orient" ||
+      plan.objects.some(
+        (object) =>
+          object.confidence >= 0.6 &&
+          Math.hypot(object.x - action.x, object.y - action.y) <= 0.2,
+      ),
+  );
+  if (actions.length === plan.actions.length) return plan;
+  return {
+    ...plan,
+    actions,
+    reply:
+      "I can't locate the target confidently in this frame. I'll check the scene again.",
+    evidence:
+      "An unsupported aiming action was removed: no current confident object observation supports its location.",
+  };
+}
+
 export function remember(previous, objects, capturedAt) {
   const memory = new Map(
-    previous.map((item) => [item.label.toLowerCase(), item]),
+    sceneObjects(previous).map((item) => [item.label.toLowerCase(), item]),
   );
-  for (const object of objects.filter((o) => o.confidence >= 0.6)) {
+  for (const object of sceneObjects(objects).filter(
+    (o) => o.confidence >= 0.6,
+  )) {
     const key = object.label.toLowerCase();
     const old = memory.get(key);
     memory.set(key, {

@@ -11,6 +11,8 @@ import {
   PlanSchema,
   VerifySchema,
   remember,
+  sceneObjects,
+  groundGoalActions,
   assertFreshFrame,
   assertVerificationOrder,
 } from "./src/protocol.js";
@@ -125,7 +127,7 @@ app.post("/api/turn", async (req, res) => {
   const generation = s.generation;
   const start = performance.now();
   try {
-    const plan = await structured(
+    let plan = await structured(
       CHARACTER_PROMPT,
       JSON.stringify({
         request: input.text,
@@ -141,7 +143,8 @@ app.post("/api/turn", async (req, res) => {
       return res
         .status(409)
         .json({ error: "Turn was cancelled or session reset." });
-    if (!input.frame) plan.objects = [];
+    plan.objects = input.frame ? sceneObjects(plan.objects) : [];
+    plan = groundGoalActions(plan);
     if (plan.intent === "goal" && (!input.frame || !plan.goal.trim()))
       throw Object.assign(
         new Error(
@@ -198,6 +201,7 @@ app.post("/api/verify", async (req, res) => {
     );
     if (sessions.get(input.session_id) !== s || s.pending !== pending)
       return res.status(409).json({ error: "Goal was cancelled." });
+    result.objects = sceneObjects(result.objects);
     s.memory = remember(s.memory, result.objects, input.frame.captured_at);
     s.pending = null;
     s.history.push({ role: "assistant", text: result.reply });
