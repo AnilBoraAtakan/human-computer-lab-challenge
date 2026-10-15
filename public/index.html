@@ -77,43 +77,28 @@
             </button>
           </div>
         </section>
-        <aside class="side-panel">
-          <section class="camera-card">
-            <div class="section-head">
-              <h2>My view</h2>
-              <span id="camera-status" class="tiny-status">CAMERA OFF</span>
+        <section class="camera-card" aria-label="Your camera">
+          <div class="section-head">
+            <h2>You</h2>
+            <span id="camera-status" class="tiny-status">CAMERA OFF</span>
+          </div>
+          <div class="camera-view">
+            <video id="camera" autoplay playsinline muted></video>
+            <div id="camera-placeholder">
+              <span class="camera-symbol">⌾</span>
+              <p>A window into your world</p>
+              <small>Camera starts only when you’re ready.</small>
             </div>
-            <div class="camera-view">
-              <video id="camera" autoplay playsinline muted></video>
-              <div id="camera-placeholder">
-                <span class="camera-symbol">⌾</span>
-                <p>A window into your world</p>
-                <small>Camera starts only when you’re ready.</small>
-              </div>
-              <span id="attention-label" class="camera-label" hidden
-                >Looking for you</span
-              >
-            </div>
-            <div class="camera-foot">
-              <span id="attention-detail"
-                >Attention is processed on this device.</span
-              ><span id="vision-ms">—</span>
-            </div>
-          </section>
-          <section class="memory-card">
-            <div class="section-head">
-              <h2>Things I remember <span id="memory-count">0</span></h2>
-              <button id="forget" class="text-button">Clear</button>
-            </div>
-            <div id="memory" class="memory-list">
-              <div class="empty-memory">
-                <span>◈</span>
-                <p>Every object has a little story.</p>
-                <small>Show me something and ask me to remember it.</small>
-              </div>
-            </div>
-          </section>
-        </aside>
+            <span id="attention-label" class="camera-label" hidden
+              >Looking for you</span
+            >
+          </div>
+          <div class="camera-foot">
+            <span id="attention-detail"
+              >Attention is processed on this device.</span
+            ><span id="vision-ms">—</span>
+          </div>
+        </section>
         <section class="conversation-card">
           <div class="section-head">
             <h2>Our conversation</h2>
@@ -182,29 +167,46 @@
             ><span id="turn-latency"></span>
           </div>
         </section>
-        <section class="activity-card">
-          <div class="section-head">
-            <h2>In the moment</h2>
-            <span class="tiny-status">OBSERVE → ACT → CHECK</span>
-          </div>
-          <div id="activity" class="activity">
-            <div class="activity-empty">
-              What I notice and do will appear here.
+        <aside class="side-panel" aria-label="Memory and activity">
+          <section class="memory-card">
+            <div class="section-head">
+              <h2>Things I remember <span id="memory-count">0</span></h2>
+              <button id="forget" class="text-button">Clear</button>
             </div>
-          </div>
-          <details class="diagnostics">
-            <summary>Under the shade <span>↗</span></summary>
-            <div class="metric-grid">
-              <div><span>Render</span><strong id="fps">—</strong></div>
-              <div><span>Server memory</span><strong id="rss">—</strong></div>
-              <div><span>Attention</span><strong id="face-time">—</strong></div>
+            <div id="memory" class="memory-list">
+              <div class="empty-memory">
+                <span>◈</span>
+                <p>Every object has a little story.</p>
+                <small>Show me something and ask me to remember it.</small>
+              </div>
             </div>
-            <div id="joints"></div>
-            <button id="export" class="text-button">
-              ↓ Export session measurements
-            </button>
-          </details>
-        </section>
+          </section>
+          <section class="activity-card">
+            <div class="section-head">
+              <h2>In the moment</h2>
+              <span class="tiny-status">OBSERVE → ACT → CHECK</span>
+            </div>
+            <div id="activity" class="activity">
+              <div class="activity-empty">
+                What I notice and do will appear here.
+              </div>
+            </div>
+            <details class="diagnostics">
+              <summary>Under the shade <span>↗</span></summary>
+              <div class="metric-grid">
+                <div><span>Render</span><strong id="fps">—</strong></div>
+                <div><span>Server memory</span><strong id="rss">—</strong></div>
+                <div>
+                  <span>Attention</span><strong id="face-time">—</strong>
+                </div>
+              </div>
+              <div id="joints"></div>
+              <button id="export" class="text-button">
+                ↓ Export session measurements
+              </button>
+            </details>
+          </section>
+        </aside>
       </div>
       <footer>
         <span

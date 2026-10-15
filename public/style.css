@@ -169,12 +169,19 @@ p {
   margin-right: 9px;
 }
 .workspace {
+  --participant-height: 490px;
   display: grid;
-  grid-template-columns: minmax(0, 1.8fr) minmax(310px, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 19px;
 }
+.workspace > * {
+  min-width: 0;
+}
+.stage-card,
+.camera-card {
+  height: var(--participant-height);
+}
 .stage-card {
-  height: 490px;
   background: #172425;
   position: relative;
   border-radius: 12px;
@@ -308,7 +315,8 @@ p {
   color: #8a9388;
 }
 .camera-view {
-  height: 165px;
+  flex: 1;
+  min-height: 0;
   background: #e4e6dc;
   position: relative;
   margin: 0 12px;
@@ -341,16 +349,16 @@ p {
   color: #7c897a;
 }
 .camera-symbol {
-  font-size: 34px;
+  font-size: 44px;
   color: #a0ac96;
   font-weight: 200;
   margin-bottom: 6px;
 }
 #camera-placeholder p {
-  font-size: 11px;
+  font-size: 14px;
 }
 #camera-placeholder small {
-  font-size: 9px;
+  font-size: 11px;
   margin-top: 7px;
   color: #99a18f;
 }
@@ -373,7 +381,6 @@ p {
   font-size: 8px;
 }
 .memory-card {
-  flex: 1;
   min-height: 205px;
 }
 .section-head h2 span {
@@ -480,8 +487,14 @@ p {
   width: 12px;
   height: 12px;
 }
+.camera-card,
+.conversation-card {
+  display: flex;
+  flex-direction: column;
+}
 .conversation {
-  height: 120px;
+  flex: 1 1 0;
+  min-height: 180px;
   overflow: auto;
   padding: 0 19px 12px;
   display: flex;
@@ -760,11 +773,8 @@ dialog li {
   }
 }
 @media (min-width: 1500px) {
-  .stage-card {
-    height: 530px;
-  }
-  .camera-view {
-    height: 190px;
+  .workspace {
+    --participant-height: 530px;
   }
   .memory-list {
     max-height: 180px;
@@ -773,9 +783,6 @@ dialog li {
 @media (max-width: 950px) {
   .topnote {
     display: none;
-  }
-  .workspace {
-    grid-template-columns: minmax(0, 1.4fr) minmax(270px, 1fr);
   }
   h1 {
     font-size: 30px;
@@ -801,6 +808,7 @@ dialog li {
     height: 70px;
   }
   .workspace {
+    --participant-height: 430px;
     grid-template-columns: 1fr;
   }
   .intro {
@@ -822,19 +830,8 @@ dialog li {
   .eyebrow {
     font-size: 7px;
   }
-  .stage-card {
-    height: 430px;
-  }
   .side-panel {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
     gap: 12px;
-  }
-  .camera-view {
-    height: 145px;
-  }
-  .camera-foot {
-    font-size: 7px;
   }
   .memory-card {
     min-height: 0;
@@ -854,15 +851,6 @@ dialog li {
   }
   .tiny-status {
     font-size: 6px;
-  }
-  .camera-symbol {
-    font-size: 25px;
-  }
-  #camera-placeholder p {
-    font-size: 9px;
-  }
-  #camera-placeholder small {
-    font-size: 7px;
   }
   footer {
     flex-direction: column;

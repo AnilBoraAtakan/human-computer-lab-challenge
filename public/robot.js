@@ -26,7 +26,8 @@ export class LampBody {
     this.scene.fog = new THREE.Fog("#172425", 3, 8);
     this.camera = new THREE.PerspectiveCamera(37, 1, 0.01, 30);
     this.camera.up.set(0, 0, 1);
-    this.camera.position.set(-1.25, -1.4, 1.04);
+    // The supplied head faces -X at its neutral yaw; meet it from the front.
+    this.camera.position.set(-1.95, 0, 0.7);
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
     this.renderer.shadowMap.enabled = true;
