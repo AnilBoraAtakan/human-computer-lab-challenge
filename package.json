@@ -1,0 +1,30 @@
+{
+  "name": "luma-character-lamp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A grounded, expressive five-DOF desk lamp character",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "dev": "node --watch --env-file-if-exists=.env server.js",
+    "setup": "node scripts/setup.mjs",
+    "test": "node --test tests/*.test.js",
+    "check": "node --check server.js",
+    "format": "prettier --no-error-on-unmatched-pattern --write \"public/*.{js,css,html}\" \"src/*.js\" \"tests/*.js\" \"scripts/*.mjs\" server.js package.json",
+    "format:check": "prettier --no-error-on-unmatched-pattern --check \"public/*.{js,css,html}\" \"src/*.js\" \"tests/*.js\" \"scripts/*.mjs\" server.js package.json"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "0.10.32",
+    "express": "5.1.0",
+    "multer": "2.4.0",
+    "three": "0.180.0",
+    "urdf-loader": "0.12.6",
+    "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "prettier": "3.6.2"
+  }
+}
