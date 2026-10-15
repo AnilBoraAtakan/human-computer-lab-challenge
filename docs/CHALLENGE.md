@@ -5,7 +5,7 @@
 Build a live, expressive character around the supplied fictional five-degree-of-
 freedom lamp robot.
 
-![Dummy five-DOF lamp robot](robot/dummy-lamp.png)
+![Dummy five-DOF lamp robot](../public/robot/dummy-lamp.png)
 
 For this exercise, the character uses the laptop camera to see, the laptop
 microphone to listen, and the laptop speaker for voice, music, and sound
@@ -84,10 +84,10 @@ what you completed and what you intentionally left out.
 
 ## Supplied files
 
-- [`robot/dummy_lamp_5dof.urdf`](robot/dummy_lamp_5dof.urdf)
-- [`robot/dummy-lamp.png`](robot/dummy-lamp.png)
-- [`robot/assets/lamp_shade.stl`](robot/assets/lamp_shade.stl)
-- [`SUBMISSION.md`](SUBMISSION.md)
+- [`robot/dummy_lamp_5dof.urdf`](../public/robot/dummy_lamp_5dof.urdf)
+- [`robot/dummy-lamp.png`](../public/robot/dummy-lamp.png)
+- [`robot/assets/lamp_shade.stl`](../public/robot/assets/lamp_shade.stl)
+- [`SUBMISSION.md`](SUBMISSION_REQUIREMENTS.md)
 
 No simulator, runtime scaffold, protocol, model wrapper, service template, or
 reference implementation is supplied.
