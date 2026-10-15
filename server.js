@@ -88,13 +88,14 @@ app.post("/api/session", (req, res) => {
     memory: [],
     history: [],
     pending: null,
-    busy: false,
+    busy: null,
     generation: 0,
     last_used: Date.now(),
   });
   res.json({ session_id });
 });
 app.delete("/api/session/:id", (req, res) => {
+  sessions.get(req.params.id)?.busy?.abort();
   sessions.delete(req.params.id);
   res.json({ ok: true });
 });
@@ -119,7 +120,8 @@ app.post("/api/turn", async (req, res) => {
       .status(409)
       .json({ error: "Finish or cancel the current turn first." });
   if (input.frame) assertFreshFrame(input.frame);
-  s.busy = true;
+  const activeRequest = new AbortController();
+  s.busy = activeRequest;
   const generation = s.generation;
   const start = performance.now();
   try {
@@ -133,6 +135,7 @@ app.post("/api/turn", async (req, res) => {
       }),
       input.frame,
       PlanSchema,
+      { signal: activeRequest.signal },
     );
     if (sessions.get(input.session_id) !== s || s.generation !== generation)
       return res
@@ -171,7 +174,7 @@ app.post("/api/turn", async (req, res) => {
       latency_ms: record("plan", start),
     });
   } finally {
-    s.busy = false;
+    if (s.busy === activeRequest) s.busy = null;
   }
 });
 app.post("/api/verify", async (req, res) => {
@@ -182,7 +185,8 @@ app.post("/api/verify", async (req, res) => {
   assertFreshFrame(input.frame);
   assertVerificationOrder(s.pending, input);
   const pending = s.pending;
-  s.busy = true;
+  const activeRequest = new AbortController();
+  s.busy = activeRequest;
   const start = performance.now();
   try {
     const result = await structured(
@@ -190,6 +194,7 @@ app.post("/api/verify", async (req, res) => {
       JSON.stringify({ goal: pending.goal, executed_actions: pending.actions }),
       input.frame,
       VerifySchema,
+      { signal: activeRequest.signal },
     );
     if (sessions.get(input.session_id) !== s || s.pending !== pending)
       return res.status(409).json({ error: "Goal was cancelled." });
@@ -203,12 +208,14 @@ app.post("/api/verify", async (req, res) => {
       latency_ms: record("verify", start),
     });
   } finally {
-    s.busy = false;
+    if (s.busy === activeRequest) s.busy = null;
   }
 });
 app.post("/api/cancel", (req, res) => {
   const s = getSession(z.string().uuid().parse(req.body.session_id));
   s.generation++;
+  s.busy?.abort();
+  s.busy = null;
   s.pending = null;
   res.json({ ok: true });
 });

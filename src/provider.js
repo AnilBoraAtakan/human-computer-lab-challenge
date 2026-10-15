@@ -11,7 +11,7 @@ async function fetchWithRetry(url, options) {
 export function providerConfigured() {
   return Boolean(process.env.GEMINI_API_KEY?.trim());
 }
-export async function geminiRequest(system, parts, schema) {
+export async function geminiRequest(system, parts, schema, { signal } = {}) {
   if (!process.env.GEMINI_API_KEY?.trim())
     throw Object.assign(
       new Error(
@@ -43,10 +43,14 @@ export async function geminiRequest(system, parts, schema) {
             },
           },
         }),
-        signal: AbortSignal.timeout(30000),
+        signal: signal
+          ? AbortSignal.any([signal, AbortSignal.timeout(30000)])
+          : AbortSignal.timeout(30000),
       },
     );
   } catch (error) {
+    if (signal?.aborted)
+      throw Object.assign(new Error("Turn was cancelled."), { status: 409 });
     console.error(
       JSON.stringify({
         event: "provider_network_error",
@@ -102,7 +106,7 @@ export async function geminiRequest(system, parts, schema) {
     );
   }
 }
-export function structured(system, text, frame, schema) {
+export function structured(system, text, frame, schema, options) {
   return geminiRequest(
     system,
     [
@@ -119,6 +123,7 @@ export function structured(system, text, frame, schema) {
         : []),
     ],
     schema,
+    options,
   );
 }
 

@@ -38,15 +38,18 @@ before(async () => {
   process.env.GEMINI_API_KEY = "test-key-not-a-secret";
   globalThis.fetch = async (url, options) => {
     if (String(url).startsWith("https://generativelanguage.googleapis.com/")) {
-      if (releaseModel)
+      const result = modelResult;
+      const waiting = releaseModel;
+      if (waiting)
         await new Promise((resolve) => {
-          releaseModel.resolve = resolve;
+          waiting.resolve = resolve;
+          waiting.signal = options.signal;
         });
       return Response.json({
         candidates: [
           {
             finishReason: "STOP",
-            content: { parts: [{ text: JSON.stringify(modelResult) }] },
+            content: { parts: [{ text: JSON.stringify(result) }] },
           },
         ],
       });
@@ -126,7 +129,7 @@ test("no-image turns cannot add invented objects to memory", async () => {
   assert.equal(result.status, 200);
   assert.deepEqual(result.body.memory, []);
 });
-test("cancelling a pending model call prevents a late plan from mutating state", async () => {
+test("cancel immediately admits a new turn; late completion cannot mutate or unlock it", async () => {
   const { body: session } = await request("/api/session", {});
   modelResult = plan;
   releaseModel = {};
@@ -137,16 +140,30 @@ test("cancelling a pending model call prevents a late plan from mutating state",
   });
   while (!releaseModel.resolve)
     await new Promise((resolve) => setTimeout(resolve, 1));
+  const oldRequest = releaseModel;
   await request("/api/cancel", { session_id: session.session_id });
-  releaseModel.resolve();
-  releaseModel = null;
-  assert.equal((await response).status, 409);
+  assert.equal(oldRequest.signal.aborted, true);
   modelResult = { ...plan, intent: "recall", objects: [], goal: "" };
-  const next = await request("/api/turn", {
+  releaseModel = {};
+  const replacement = request("/api/turn", {
     session_id: session.session_id,
     text: "Remember?",
     frame: null,
   });
+  while (!releaseModel.resolve)
+    await new Promise((resolve) => setTimeout(resolve, 1));
+  oldRequest.resolve();
+  assert.equal((await response).status, 409);
+  const overlap = await request("/api/turn", {
+    session_id: session.session_id,
+    text: "Too soon",
+    frame: null,
+  });
+  assert.equal(overlap.status, 409);
+  releaseModel.resolve();
+  releaseModel = null;
+  const next = await replacement;
+  assert.equal(next.status, 200);
   assert.deepEqual(next.body.memory, []);
 });
 test("cross-origin requests fail and credentials are absent from public status", async () => {
