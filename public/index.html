@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f3f1e9" />
+    <title>Luma — a little light, paying attention</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%23253631'/%3E%3Cpath d='M11 29h18M20 29V19l-6-7 9-4 5 10-9 4' stroke='%23ffdb91' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="/style.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "/vendor/three/build/three.module.js",
+          "three/addons/": "/vendor/three/examples/jsm/",
+          "three/examples/jsm/": "/vendor/three/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Luma home"
+        ><span class="brand-mark">✳</span> luma<span class="brand-dot"
+          >.</span
+        ></a
+      ><span class="topnote">A LITTLE LIGHT, PAYING ATTENTION</span>
+      <div class="top-actions">
+        <span id="connection" class="pill"><i></i> Connecting</span
+        ><button
+          id="help"
+          class="icon-button"
+          title="Demo guide"
+          aria-label="Open demo guide"
+        >
+          ?
+        </button>
+      </div>
+    </header>
+    <main>
+      <div class="intro">
+        <div>
+          <div class="eyebrow">THE CURIOUS DESK COMPANION</div>
+          <h1>A moment of connection.</h1>
+          <p>Look this way. Show me something. Let’s see what happens.</p>
+        </div>
+        <button id="start" class="button primary">
+          <span class="play-icon">▶</span> Start session
+        </button>
+      </div>
+      <div id="notice" class="notice" role="status" hidden></div>
+      <div class="workspace">
+        <section class="stage-card" aria-label="Luma robot simulator">
+          <div class="stage-top">
+            <span class="stage-title"
+              ><i id="state-dot"></i><span id="state-label">Resting</span></span
+            ><span class="stage-tag">LIVE CHARACTER · 5 DOF</span>
+          </div>
+          <div id="stage"></div>
+          <div class="stage-caption">
+            <span id="stage-kicker">HELLO, HUMAN</span>
+            <h2 id="caption">I’m here when you are.</h2>
+            <p id="caption-detail">Start a session to switch on my senses.</p>
+          </div>
+          <div class="stage-bottom">
+            <button id="preview" class="stage-button" disabled>
+              ↗ Test movement</button
+            ><span>Drag to orbit · Scroll to zoom</span
+            ><button
+              id="stop"
+              class="stop-button"
+              title="Stop movement, recording, and voice"
+            >
+              ■ Stop
+            </button>
+          </div>
+        </section>
+        <aside class="side-panel">
+          <section class="camera-card">
+            <div class="section-head">
+              <h2>My view</h2>
+              <span id="camera-status" class="tiny-status">CAMERA OFF</span>
+            </div>
+            <div class="camera-view">
+              <video id="camera" autoplay playsinline muted></video>
+              <div id="camera-placeholder">
+                <span class="camera-symbol">⌾</span>
+                <p>A window into your world</p>
+                <small>Camera starts only when you’re ready.</small>
+              </div>
+              <span id="attention-label" class="camera-label" hidden
+                >Looking for you</span
+              >
+            </div>
+            <div class="camera-foot">
+              <span id="attention-detail"
+                >Attention is processed on this device.</span
+              ><span id="vision-ms">—</span>
+            </div>
+          </section>
+          <section class="memory-card">
+            <div class="section-head">
+              <h2>Things I remember <span id="memory-count">0</span></h2>
+              <button id="forget" class="text-button">Clear</button>
+            </div>
+            <div id="memory" class="memory-list">
+              <div class="empty-memory">
+                <span>◈</span>
+                <p>Every object has a little story.</p>
+                <small>Show me something and ask me to remember it.</small>
+              </div>
+            </div>
+          </section>
+        </aside>
+        <section class="conversation-card">
+          <div class="section-head">
+            <h2>Our conversation</h2>
+            <div class="conversation-tools">
+              <label class="toggle"
+                ><input id="voice" type="checkbox" checked /><span
+                  >Voice on</span
+                ></label
+              ><span class="tiny-status">SYNTHETIC VOICE</span>
+            </div>
+          </div>
+          <div
+            id="conversation"
+            class="conversation"
+            role="log"
+            aria-live="polite"
+          >
+            <div class="conversation-empty">
+              A glance starts a connection. A question starts a conversation.
+            </div>
+          </div>
+          <div class="suggestions">
+            <button data-prompt="Remember the object I am showing you.">
+              Remember this</button
+            ><button
+              data-prompt="What do you remember about the object I showed you?"
+            >
+              What do you remember?</button
+            ><button
+              data-prompt="Find the object I am showing you, look toward it, then check whether it is still there."
+            >
+              Look, then check</button
+            ><button data-prompt="Let's celebrate with a little music!">
+              A little celebration
+            </button>
+          </div>
+          <form id="message-form">
+            <button
+              type="button"
+              id="microphone"
+              aria-label="Start microphone recording"
+              title="Click to record; click again to send"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+              >
+                <rect x="9" y="3" width="6" height="12" rx="3" />
+                <path d="M5 10v2a7 7 0 0014 0v-2M12 19v3M8 22h8" />
+              </svg></button
+            ><input
+              id="message"
+              autocomplete="off"
+              maxlength="1000"
+              placeholder="Ask Luma something…"
+              aria-label="Message to Luma"
+            /><button type="submit" id="send" aria-label="Send message">
+              ↑
+            </button>
+          </form>
+          <div class="input-foot">
+            <span id="input-hint"
+              >Click the microphone to speak. Click again to send.</span
+            ><span id="turn-latency"></span>
+          </div>
+        </section>
+        <section class="activity-card">
+          <div class="section-head">
+            <h2>In the moment</h2>
+            <span class="tiny-status">OBSERVE → ACT → CHECK</span>
+          </div>
+          <div id="activity" class="activity">
+            <div class="activity-empty">
+              What I notice and do will appear here.
+            </div>
+          </div>
+          <details class="diagnostics">
+            <summary>Under the shade <span>↗</span></summary>
+            <div class="metric-grid">
+              <div><span>Render</span><strong id="fps">—</strong></div>
+              <div><span>Server memory</span><strong id="rss">—</strong></div>
+              <div><span>Attention</span><strong id="face-time">—</strong></div>
+            </div>
+            <div id="joints"></div>
+            <button id="export" class="text-button">
+              ↓ Export session measurements
+            </button>
+          </details>
+        </section>
+      </div>
+      <footer>
+        <span
+          >Built around the supplied five-joint lamp. Simulated body, real
+          observations.</span
+        ><span id="privacy-note"
+          >Camera snapshots and recorded speech go to your configured AI
+          provider on request.</span
+        >
+      </footer>
+    </main>
+    <dialog id="guide">
+      <button
+        id="close-guide"
+        class="close-dialog"
+        aria-label="Close demo guide"
+      >
+        ×
+      </button>
+      <div class="eyebrow">A TWO-MINUTE INTRODUCTION</div>
+      <h2>Meet Luma.</h2>
+      <ol>
+        <li>
+          <strong>Make eye contact.</strong> Start the session and face the
+          camera. I’ll wake up after a short moment. Look away for two seconds
+          and I’ll settle.
+        </li>
+        <li>
+          <strong>Give me a memory.</strong> Hold up a mug or another everyday
+          object. Click the mic, say “Remember this,” then click again.
+        </li>
+        <li>
+          <strong>Put it out of sight.</strong> Ask “What color was the object I
+          showed you?” I’ll use my earlier observation.
+        </li>
+        <li>
+          <strong>Give me a goal.</strong> Show it again and say “Look toward
+          the mug, then check whether it’s still there.” I’ll move, take a fresh
+          look, and report what I see.
+        </li>
+        <li>
+          <strong>Celebrate.</strong> Ask for a little music. Motion, light, and
+          melody come together.
+        </li>
+      </ol>
+      <p class="guide-note">
+        The head-direction estimate is a coarse attention signal, not precise
+        eye tracking. My simulated light cannot illuminate your physical room.
+      </p>
+    </dialog>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
